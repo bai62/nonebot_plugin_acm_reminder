@@ -59,15 +59,11 @@ async def startup():
 
 @contest_list.handle()
 async def get_list(event: MessageEvent, args: Message = CommandArg()):
-    msg = '<div align="center">\n <h1> 近期竞赛 </h1> \n</div>'
+    msg = '<div align="center">\n <h1> 近期竞赛，火速参加 </h1> \n</div>'
     for contest in contest_data:
         time = datetime.fromtimestamp(
             contest["time"]).strftime("%Y-%m-%d %H:%M")
-        writes = ",".join(filter(None, contest["writes"])) if len(
-            contest["writes"]) < 5 else ",".join(filter(None, contest["writes"][:5])) + "..."
         msg += f"## {contest['name']}\n" \
-            f"* 竞赛平台  **{contest['platform']}**\n" \
-            f"* 举办人员 {writes}\n" \
             f"* 开始时间 **{time}**\n" \
             f"* 竞赛时长 **{contest['length']/60}h**\n"
     await contest_list.finish(MessageSegment.image(await md_to_pic(msg)))

@@ -48,18 +48,17 @@ def html_parse_cf(content: str) -> list[ContestType]:
 
     # 解析竞赛信息
     contest_list = datatable.find_all("tr")  # type: ignore
-    for contest in contest_list:
+    for i in range(0,2):
+        contest=contest_list[i+1]
         cdata = contest.find_all("td")
         if cdata:
             cwriters = [i.string for i in cdata[1].find_all("a")] #获得主办方
-            ctime = mktime(strptime(cdata[2].find("span").string, "%b/%d/%Y %H:%M")) #获得开始时间戳
+            ctime = mktime(strptime(cdata[2].find("span").string, "%b/%d/%Y %H:%M"))
             ctime+=5*60*60
             clength = strptime(str(cdata[3].string).strip("\n").strip(), "%H:%M")
-            contest_data.append({"name": str(cdata[0].string).strip("\n").strip(), 
-                                "writes": cwriters, 
+            contest_data.append({"name": str(cdata[0].string).strip("\n").strip(),
                                 "time": ctime, 
-                                "length": clength.tm_hour * 60 + clength.tm_min, 
-                                "platform": "Codeforces", 
+                                "length": clength.tm_hour * 60 + clength.tm_min,
                                 "id": contest.get("data-contestid")})
     return contest_data
 
@@ -76,13 +75,12 @@ def html_parse_nc(content: str) -> list[ContestType]:
     contest_data: list[ContestType] = []
     soup = BeautifulSoup(content, 'html.parser')
     datatable: ResultSet = soup.find('div', class_='platform-mod js-current').find_all('div', class_='platform-item js-item') #type: ignore
-    for contest in datatable:
+    for i in range(0, 2):
+        contest = datatable[i]
         cdata = loads(unescape(contest.get("data-json")))
         if cdata:
-            contest_data.append({"name": cdata["contestName"], 
-                                "writes": [cdata["settingInfo"]["organizerName"]], 
+            contest_data.append({"name": cdata["contestName"],
                                 "time":  cdata["contestStartTime"] / 1000, 
-                                "length": cdata["contestDuration"] / 1000 / 60, 
-                                "platform": "Nowcoder", 
+                                "length": cdata["contestDuration"] / 1000 / 60,
                                 "id": cdata["contestId"]})
     return contest_data
