@@ -52,7 +52,6 @@ def html_parse_cf(content: str) -> list[ContestType]:
         contest=contest_list[i+1]
         cdata = contest.find_all("td")
         if cdata:
-            cwriters = [i.string for i in cdata[1].find_all("a")] #获得主办方
             ctime = mktime(strptime(cdata[2].find("span").string, "%b/%d/%Y %H:%M"))
             ctime+=5*60*60
             clength = strptime(str(cdata[3].string).strip("\n").strip(), "%H:%M")
@@ -83,4 +82,27 @@ def html_parse_nc(content: str) -> list[ContestType]:
                                 "time":  cdata["contestStartTime"] / 1000, 
                                 "length": cdata["contestDuration"] / 1000 / 60,
                                 "id": cdata["contestId"]})
+    return contest_data
+
+def html_parse_acw(content: str) -> list[ContestType]:
+    """
+    处理AcWing的竞赛列表
+
+    Args:
+        content (str): HTML
+
+    Returns:
+        list: 竞赛列表
+    """
+    contest_data: list[ContestType] = []
+    soup = BeautifulSoup(content, 'html.parser')
+    cdata: ResultSet = soup.find('div', class_='activity-index-block') #type: ignore
+
+    if cdata:
+        ctime = mktime(strptime(cdata.find_all("span",{'class':'activity_td'})[1].string, "%Y-%m-%d %H:%M:%S"))
+        cname = 'AcWing'+str(cdata.find('span',{'class':'activity_title'}).string).replace(" ","")
+        contest_data.append({"name":cname,
+                             "time": ctime,
+                             "length": 75,
+                             "id": 1})
     return contest_data

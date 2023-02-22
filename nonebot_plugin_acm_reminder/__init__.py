@@ -9,7 +9,7 @@ require("nonebot_plugin_htmlrender")
 from nonebot_plugin_apscheduler import scheduler
 from nonebot_plugin_htmlrender import md_to_pic
 
-from .data_source import ContestType, req_get, html_parse_cf, html_parse_nc
+from .data_source import ContestType, req_get, html_parse_cf, html_parse_nc,html_parse_acw
 from .config import Config
 
 __plugin_meta__ = PluginMetadata(
@@ -35,7 +35,7 @@ async def update():
     contest_data.clear()
     contest_data.extend(html_parse_cf(await req_get("https://codeforces.com/contests")))
     contest_data.extend(html_parse_nc(await req_get("https://ac.nowcoder.com/acm/contest/vip-index?topCategoryFilter=13")))
-
+    contest_data.extend(html_parse_acw(await req_get("https://www.acwing.com/activity/1/competition/")))
 
 @scheduler.scheduled_job('interval', minutes=plugin_config.update_time, id="update_contest")
 async def update_contest():
